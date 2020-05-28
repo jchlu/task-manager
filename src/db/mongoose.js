@@ -11,16 +11,12 @@ mongoose.connect(`${connectionURL}/${databaseName}`, {
   useCreateIndex: true
 })
 
-const task = new Task({
-  description: 'Eat sausages for tea',
-  completed: 'false'
+const user = new User({
+  name: 'Bill',
+  age: 24,
+  email: 'bill+goat.sausages.com'
 })
 
-const validated = new User({
-  name: 'Sausage',
-  age: 5
-})
-
-validated.save().then(_ => {
-  console.log(validated)
+user.save().then(_ => {
+  console.log(user)
 }).catch(e => { console.error(e.message) })

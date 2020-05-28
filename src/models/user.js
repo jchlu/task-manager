@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const validator = require('validator')
 
 const User = mongoose.model('User', {
   name: {
@@ -10,6 +11,14 @@ const User = mongoose.model('User', {
     validate: age => {
       if (age < 0) {
         throw new Error(`Age must be a positive number, ${age} given.`)
+      }
+    }
+  },
+  email: {
+    type: String,
+    validate: email => {
+      if (!validator.isEmail(email)) {
+        throw new Error(`I'm afraid ${email} doesn't validate as an email address`)
       }
     }
   }
