@@ -1,29 +1,22 @@
 const mongoose = require('mongoose')
+const Task = require('../models/task')
 
 const connectionURL = 'mongodb://127.0.0.1:27017'
 const databaseName = 'task-manager-api'
 
 mongoose.connect(`${connectionURL}/${databaseName}`, {
   useUnifiedTopology: true,
+  useNewUrlParser: true,
   useCreateIndex: true
 })
 
-const User = mongoose.model('User', {
-  name: {
-    type: String
-  },
-  age: {
-    type: Number
-  }
+const drink = new Task({
+  description: 'Drink an ice cold Presidente',
+  completed: 'false'
 })
 
-const me = new User({
-  name: 'Johnny',
-  age: 49
-})
-
-me.save().then(_ => {
-  console.log(me)
-}).catch(error => {
-  console.error('Error!', error)
+drink.save().then(_ => {
+  console.log(drink)
+}).catch(e => {
+  console.error(e.message)
 })
