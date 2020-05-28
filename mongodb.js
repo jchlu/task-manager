@@ -7,11 +7,11 @@ MongoClient.connect(connectionURL, { useUnifiedTopology: true }, (error, client)
   if (error) { return console.error('Could not connect to database') }
   console.log('Connected successfully')
   const db = client.db(databaseName)
-  db.collection('users').updateOne({
-    _id: ObjectId('5ecfee78ea7af563501f2cb2')
+  db.collection('tasks').updateMany({
+    completed: false
   }, {
-    $inc: {
-      age: 1
+    $set: {
+      completed: true
     }
   }).then(result => {
     console.log(result.modifiedCount)
