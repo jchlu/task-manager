@@ -10,8 +10,8 @@ MongoClient.connect(connectionURL, { useUnifiedTopology: true }, (error, client)
   db.collection('users').updateOne({
     _id: ObjectId('5ecfee78ea7af563501f2cb2')
   }, {
-    $set: {
-      age: 56
+    $inc: {
+      age: 1
     }
   }).then(result => {
     console.log(result.modifiedCount)
