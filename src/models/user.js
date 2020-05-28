@@ -4,7 +4,8 @@ const validator = require('validator')
 const User = mongoose.model('User', {
   name: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   age: {
     type: Number,
@@ -16,6 +17,8 @@ const User = mongoose.model('User', {
   },
   email: {
     type: String,
+    trim: true,
+    lowercase: true,
     validate: email => {
       if (!validator.isEmail(email)) {
         throw new Error(`I'm afraid ${email} doesn't validate as an email address`)
