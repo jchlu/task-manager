@@ -4,7 +4,8 @@
   "main": "mongodb.js",
   "license": "MIT",
   "dependencies": {
-    "mongodb": "^3.5.8"
+    "mongodb": "^3.5.8",
+    "mongoose": "^5.9.16"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
