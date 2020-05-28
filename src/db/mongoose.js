@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Task = require('../models/task')
+const User = require('../models/user')
 
 const connectionURL = 'mongodb://127.0.0.1:27017'
 const databaseName = 'task-manager-api'
@@ -15,8 +16,11 @@ const task = new Task({
   completed: 'false'
 })
 
-task.save().then(_ => {
-  console.log(task)
-}).catch(e => {
-  console.error(e.message)
+const validated = new User({
+  name: 'Sausage',
+  age: 5
 })
+
+validated.save().then(_ => {
+  console.log(validated)
+}).catch(e => { console.error(e.message) })
