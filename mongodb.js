@@ -7,14 +7,15 @@ MongoClient.connect(connectionURL, { useUnifiedTopology: true }, (error, client)
   if (error) { return console.error('Could not connect to database') }
   console.log('Connected successfully')
   const db = client.db(databaseName)
-  // .find() returns a cursor, .toArray() takes a callback
-  const result = db.collection('users').find({ name: 'Johnny' })
-  result.toArray((error, users) => {
-    if (error) { return console.error(error) }
-    console.log(users)
-  })
-  result.count((error, count) => {
-    if (error) { return console.error(error) }
-    console.log(count)
+  db.collection('users').updateOne({
+    _id: ObjectId('5ecfee78ea7af563501f2cb2')
+  }, {
+    $set: {
+      age: 56
+    }
+  }).then(result => {
+    console.log(result.modifiedCount)
+  }).catch(error => {
+    console.error(error)
   })
 })
