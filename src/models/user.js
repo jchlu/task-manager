@@ -24,6 +24,17 @@ const User = mongoose.model('User', {
         throw new Error(`I'm afraid ${email} doesn't validate as an email address`)
       }
     }
+  },
+  password: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 7,
+    validate: password => {
+      if (password.toLowerCase().includes('password')) {
+        throw new Error('Sorry, paswords can\'t contain the string "password"')
+      }
+    }
   }
 })
 

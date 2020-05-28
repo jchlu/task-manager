@@ -12,19 +12,21 @@ mongoose.connect(`${connectionURL}/${databaseName}`, {
 })
 
 const user = new User({
-  name: '    Billiam    ',
-  age: 24,
-  email: 'bill+JEANPAULGOATYEAH@sausages.com      '
+  name: 'Snorker',
+  age: 26,
+  email: 'snorker@sausages.com      ',
+  password: 'My n3w Pa55w0rd! dot com'
 })
 
-user.save().then(_ => {
+/* user.save().then(_ => {
   console.log(user)
 }).catch(e => { console.error(e.message) })
-
+ */
 const task = new Task({
   description: '     Grab a beer!   '
 })
 
-task.save().then(_ => {
+/* task.save().then(_ => {
   console.log(task)
 }).catch(e => { console.error(e.message) })
+ */
