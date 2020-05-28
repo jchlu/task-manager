@@ -7,8 +7,9 @@ MongoClient.connect(connectionURL, { useUnifiedTopology: true }, (error, client)
   if (error) { return console.error('Could not connect to database') }
   console.log('Connected successfully')
   const db = client.db(databaseName)
-  db.collection('users').findOne({ _id: ObjectId('5ecff2b6cdb88170ea7e6f8f') }, (error, user) => {
+  // .find() returns a cursor, .toArray() takes a callback
+  db.collection('users').find({ name: 'Johnny' }).toArray((error, users) => {
     if (error) { return console.error(error) }
-    console.log(user)
+    console.log(users)
   })
 })
