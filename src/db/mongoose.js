@@ -10,13 +10,13 @@ mongoose.connect(`${connectionURL}/${databaseName}`, {
   useCreateIndex: true
 })
 
-const drink = new Task({
-  description: 'Drink an ice cold Presidente',
+const task = new Task({
+  description: 'Eat sausages for tea',
   completed: 'false'
 })
 
-drink.save().then(_ => {
-  console.log(drink)
+task.save().then(_ => {
+  console.log(task)
 }).catch(e => {
   console.error(e.message)
 })
