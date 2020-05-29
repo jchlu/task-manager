@@ -1,6 +1,6 @@
 const express = require('express')
-const mongoose = require('mongoose')
 require('./db/mongoose')
+const { isValidId, updateContainsValidFields } = require('./utils/utils')
 const User = require('./models/user')
 const Task = require('./models/task')
 
@@ -13,17 +13,6 @@ app.post('/users', async (req, res) => {
   try {
     await user.save()
     res.status(201).json(user)
-  } catch (error) {
-    res.status(400).json({ message: error.message })
-  }
-})
-
-// CREATE Task
-app.post('/tasks', async (req, res) => {
-  const task = new Task(req.body)
-  try {
-    await task.save()
-    res.status(201).json(task)
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
@@ -44,7 +33,7 @@ app.get('/users/:id', async (req, res) => {
   const _id = req.params.id
   try {
     // Check id is valid to avoid Mongoose 500
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
+    if (!isValidId(_id)) {
       return res.status(400).json({ message: '_id is not valid' })
     }
     const user = await User.findById(_id)
@@ -52,6 +41,36 @@ app.get('/users/:id', async (req, res) => {
     res.json(user)
   } catch (error) {
     res.status(500).json()
+  }
+})
+
+// UPDATE (patch) a User by id
+app.patch('/users/:id', async (req, res) => {
+  try {
+    if (!updateContainsValidFields(User, req.body)) {
+      return res.status(400).json({ message: 'Not a valid update' })
+    }
+    const _id = req.params.id
+    // Check id is valid to avoid Mongoose 500
+    if (!isValidId(_id)) {
+      return res.status(400).json({ message: 'That doesn\'t seem to be a valid id' })
+    }
+    const user = await User.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
+    if (!user) { return res.status(404).json() }
+    res.json(user)
+  } catch (error) {
+    res.status(400).json(error.message)
+  }
+})
+
+// CREATE Task
+app.post('/tasks', async (req, res) => {
+  const task = new Task(req.body)
+  try {
+    await task.save()
+    res.status(201).json(task)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
   }
 })
 
@@ -70,7 +89,7 @@ app.get('/tasks/:id', async (req, res) => {
   const _id = req.params.id
   try {
     // Check id is valid to avoid Mongoose 500
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
+    if (!isValidId(_id)) {
       return res.status(400).json({ message: '_id is not valid' })
     }
     const task = await Task.findById(_id)
@@ -78,6 +97,25 @@ app.get('/tasks/:id', async (req, res) => {
     res.json(task)
   } catch (error) {
     res.status(500).json()
+  }
+})
+
+// UPDATE a Task by id
+app.patch('/tasks/:id', async (req, res) => {
+  try {
+    if (!updateContainsValidFields(Task, req.body)) {
+      return res.status(400).json({ message: 'Not a valid update' })
+    }
+    // Check id is valid to avoid Mongoose 500
+    const _id = req.params.id
+    if (!isValidId(_id)) {
+      return res.status(400).json({ message: '_id is not valid' })
+    }
+    const task = await Task.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
+    if (!task) { return res.status(404).json() }
+    res.json(task)
+  } catch (error) {
+    res.status(400).json(error.message)
   }
 })
 
