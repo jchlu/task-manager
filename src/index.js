@@ -8,84 +8,77 @@ const port = process.env.PORT || 3000
 const app = express().use(express.json())
 
 // CREATE User
-app.post('/users', (req, res) => {
+app.post('/users', async (req, res) => {
   const user = new User(req.body)
-  user.save()
-    .then(_ => {
-      res.status(201).json(user)
-    })
-    .catch(e => {
-      res.status(400).json({ message: e.message })
-    })
+  try {
+    await user.save()
+    res.status(201).json(user)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
 })
 
 // CREATE Task
-app.post('/tasks', (req, res) => {
+app.post('/tasks', async (req, res) => {
   const task = new Task(req.body)
-  task.save()
-    .then(_ => {
-      res.status(201).json(task)
-    })
-    .catch(e => {
-      res.status(400).json({ message: e.message })
-    })
+  try {
+    await task.save()
+    res.status(201).json(task)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
 })
 
 // READ all Users
-app.get('/users', (req, res) => {
-  User.find({})
-    .then(users => {
-      res.json(users)
-    })
-    .catch(e => {
-      res.status(500).json()
-    })
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.find({})
+    res.json(users)
+  } catch (error) {
+    res.status(500).json()
+  }
 })
 
 // READ a User by id
-app.get('/users/:id', (req, res) => {
+app.get('/users/:id', async (req, res) => {
   const _id = req.params.id
-  // Check id is valid to avoid Mongoose 500
-  if (!mongoose.Types.ObjectId.isValid(_id)) {
-    return res.status(400).json({ message: '_id is not valid' })
+  try {
+    // Check id is valid to avoid Mongoose 500
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({ message: '_id is not valid' })
+    }
+    const user = await User.findById(_id)
+    if (!user) { return res.status(404).json() }
+    res.json(user)
+  } catch (error) {
+    res.status(500).json()
   }
-  User.findById(_id)
-    .then(user => {
-      console.log(`User from findById is: ${user}`)
-      if (!user) { return res.status(404).json() }
-      res.json(user)
-    })
-    .catch(e => {
-      res.status(500).json()
-    })
 })
 
 // READ all Tasks
-app.get('/tasks', (req, res) => {
-  Task.find({})
-    .then(tasks => {
-      res.json(tasks)
-    })
-    .catch(e => {
-      res.status(500).json()
-    })
+app.get('/tasks', async (req, res) => {
+  try {
+    const tasks = await Task.find({})
+    res.json(tasks)
+  } catch (error) {
+    res.status(500).json()
+  }
 })
 
 // READ Task by id
-app.get('/tasks/:id', (req, res) => {
+app.get('/tasks/:id', async (req, res) => {
   const _id = req.params.id
-  // Check id is valid to avoid Mongoose 500
-  if (!mongoose.Types.ObjectId.isValid(_id)) {
-    return res.status(400).json({ message: '_id is not valid' })
+  try {
+    // Check id is valid to avoid Mongoose 500
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({ message: '_id is not valid' })
+    }
+    const task = await Task.findById(_id)
+    if (!task) { return res.status(404).json() }
+    res.json(task)
+  } catch (error) {
+    res.status(500).json()
   }
-  Task.findById(_id)
-    .then(task => {
-      if (!task) { return res.status(404).json() }
-      res.json(task)
-    })
-    .catch(e => {
-      res.status(500).json()
-    })
 })
 
 app.listen(port, _ => {
