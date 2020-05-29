@@ -6,5 +6,6 @@ const databaseName = 'task-manager-api'
 mongoose.connect(`${connectionURL}/${databaseName}`, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
-  useCreateIndex: true
+  useCreateIndex: true,
+  useFindAndModify: false
 })
