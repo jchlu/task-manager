@@ -53,7 +53,9 @@ router.patch('/tasks/:id', async (req, res) => {
     if (!isValidId(_id)) {
       return res.status(400).json({ message: '_id is not valid' })
     }
-    const task = await Task.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
+    const task = await Task.findById(_id)
+    Object.keys(req.body).forEach(update => { task[update] = req.body[update] })
+    await task.save()
     if (!task) { return res.status(404).json() }
     res.json(task)
   } catch (error) {

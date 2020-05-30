@@ -1,7 +1,8 @@
+const bcrypt = require('bcryptjs')
 const mongoose = require('mongoose')
 const validator = require('validator')
 
-const User = mongoose.model('User', {
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -37,5 +38,20 @@ const User = mongoose.model('User', {
     }
   }
 })
+
+// MIDDLEWARE
+userSchema.pre('save', async function (next) {
+  // Must be a regular function to have 'this' binding
+  const user = this
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8)
+  }
+  if (user.isModified('name')) {
+    console.log('Name modified')
+  }
+  next()
+})
+
+const User = mongoose.model('User', userSchema)
 
 module.exports = User

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const Task = mongoose.model('Task', {
+const taskSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true,
@@ -11,5 +11,17 @@ const Task = mongoose.model('Task', {
     default: false
   }
 })
+
+/*
+// MIDDLEWARE
+taskSchema.pre('save', async function (next) {
+  // Must be a regular function to have 'this' binding
+  const task = this
+  // Do stuff on task
+  next()
+})
+ */
+
+const Task = mongoose.model('Task', taskSchema)
 
 module.exports = Task

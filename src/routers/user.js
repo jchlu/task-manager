@@ -53,7 +53,9 @@ router.patch('/users/:id', async (req, res) => {
     if (!isValidId(_id)) {
       return res.status(400).json({ message: 'That doesn\'t seem to be a valid id' })
     }
-    const user = await User.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
+    const user = await User.findById(_id)
+    Object.keys(req.body).forEach(update => { user[update] = req.body[update] })
+    await user.save()
     if (!user) { return res.status(404).json() }
     res.json(user)
   } catch (error) {
