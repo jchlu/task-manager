@@ -63,6 +63,22 @@ app.patch('/users/:id', async (req, res) => {
   }
 })
 
+// DELETE a User by id
+app.delete('/users/:id', async (req, res) => {
+  const _id = req.params.id
+  try {
+    // Check id is valid to avoid Mongoose 500
+    if (!isValidId(_id)) {
+      return res.status(400).json({ message: '_id is not valid' })
+    }
+    const user = await User.findByIdAndDelete(_id)
+    if (!user) { return res.status(404).json() }
+    res.json(user)
+  } catch (error) {
+    res.status(500).json()
+  }
+})
+
 // CREATE Task
 app.post('/tasks', async (req, res) => {
   const task = new Task(req.body)
@@ -116,6 +132,22 @@ app.patch('/tasks/:id', async (req, res) => {
     res.json(task)
   } catch (error) {
     res.status(400).json(error.message)
+  }
+})
+
+// DELETE Task by id
+app.delete('/tasks/:id', async (req, res) => {
+  const _id = req.params.id
+  try {
+    // Check id is valid to avoid Mongoose 500
+    if (!isValidId(_id)) {
+      return res.status(400).json({ message: '_id is not valid' })
+    }
+    const task = await Task.findByIdAndDelete(_id)
+    if (!task) { return res.status(404).json() }
+    res.json(task)
+  } catch (error) {
+    res.status(500).json()
   }
 })
 
