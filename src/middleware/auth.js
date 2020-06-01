@@ -2,8 +2,7 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
 module.exports = async (req, res, next) => {
-  if ((req.method === 'GET' && req.path === '/users/login') ||
-    (req.method === 'POST' && req.path === '/users')) {
+  if (req.method === 'POST' && ((req.path === '/users/login') || (req.path === '/users'))) {
     next()
   } else {
     try {
