@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const validator = require('validator')
+const Task = require('./task')
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -85,7 +86,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
   return user
 }
 
-// MIDDLEWARE
+// MIDDLEWARE on save to hash passwords
 userSchema.pre('save', async function (next) {
   // Must be a regular function to have 'this' binding
   const user = this
@@ -95,6 +96,13 @@ userSchema.pre('save', async function (next) {
   if (user.isModified('name')) {
     console.log('Name modified')
   }
+  next()
+})
+
+// MIDDLEWARE on remove to cascade Task deletion
+userSchema.pre('remove', async function (next) {
+  const user = this
+  await Task.deleteMany({ owner: user._id })
   next()
 })
 
