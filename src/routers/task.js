@@ -74,9 +74,8 @@ router.delete('/tasks/:id', async (req, res) => {
     if (!isValidId(_id)) {
       return res.status(400).json({ message: '_id is not valid' })
     }
-    const task = await Task.findOne({ _id, owner: req.taskManagerUser._id })
+    const task = await Task.findOneAndDelete({ _id, owner: req.taskManagerUser._id })
     if (!task) { return res.status(404).json() }
-    task.remove()
     res.json(task)
   } catch (error) {
     res.status(500).json()
