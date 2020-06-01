@@ -87,4 +87,26 @@ router.post('/users/login', async (req, res) => {
   }
 })
 
+// User Logout
+router.post('/users/logout', async (req, res) => {
+  try {
+    req.taskManagerUser.tokens = req.taskManagerUser.tokens.filter(token => token.token !== req.taskManagerToken)
+    await req.taskManagerUser.save()
+    res.json()
+  } catch (e) {
+    res.status(500).json()
+  }
+})
+
+// User Logout Everywhere
+router.post('/users/logout-everywhere', async (req, res) => {
+  try {
+    req.taskManagerUser.tokens = []
+    await req.taskManagerUser.save()
+    res.json()
+  } catch (e) {
+    res.status(500).json()
+  }
+})
+
 module.exports = router
