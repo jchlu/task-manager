@@ -47,6 +47,12 @@ const userSchema = new mongoose.Schema({
   }]
 })
 
+userSchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'owner'
+})
+
 // Remove sensitive data before responding, using built-in toJSON method
 userSchema.methods.toJSON = function () {
   const publicUser = this.toObject()

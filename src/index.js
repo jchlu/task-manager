@@ -17,17 +17,15 @@ app.listen(port, _ => {
   console.log(`Server up and running at port ${port}`)
 })
 
-/*
-const jwt = require('jsonwebtoken')
-
-const myFunction = async _ => {
+const User = require('./models/user')
+const main = async _ => {
   try {
-    const token = jwt.sign({ _id: '5ed03ac4a3f01e29ca7f3263' }, process.env.JWT_SECRET)
-    console.log(token)
+    const user = await User.findById('5ed41e28c3fcea6a36f8a48e')
+    await user.populate('tasks').execPopulate()
+    console.log(user.tasks)
   } catch (e) {
     console.error(e)
   }
 }
 
-myFunction()
- */
+main()

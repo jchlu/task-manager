@@ -7,7 +7,10 @@ const router = express.Router()
 
 // CREATE Task
 router.post('/tasks', async (req, res) => {
-  const task = new Task(req.body)
+  const task = new Task({
+    ...req.body,
+    owner: req.taskManagerUser._id
+  })
   try {
     await task.save()
     res.status(201).json(task)
