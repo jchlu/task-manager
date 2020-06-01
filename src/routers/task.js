@@ -20,6 +20,7 @@ router.post('/tasks', async (req, res) => {
 })
 
 // READ all Tasks
+// GET /tasks?completed=[true|false]&limit=[int]&skip=[int]
 router.get('/tasks', async (req, res) => {
   const match = {}
   if (req.query.completed) {
@@ -28,7 +29,11 @@ router.get('/tasks', async (req, res) => {
   try {
     await req.taskManagerUser.populate({
       path: 'tasks',
-      match
+      match,
+      options: {
+        limit: parseInt(req.query.limit),
+        skip: parseInt(req.query.skip)
+      }
     }).execPopulate()
     res.json(req.taskManagerUser.tasks)
   } catch (e) {
