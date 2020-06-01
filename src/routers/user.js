@@ -17,14 +17,9 @@ router.post('/users', async (req, res) => {
   }
 })
 
-// READ all Users
-router.get('/users', async (req, res) => {
-  try {
-    const users = await User.find({})
-    res.json(users)
-  } catch (error) {
-    res.status(500).json()
-  }
+// READ an Authenticated User Profile
+router.get('/users/me', async (req, res) => {
+  res.json(req.taskManagerUser)
 })
 
 // READ a User by id
