@@ -47,6 +47,15 @@ const userSchema = new mongoose.Schema({
   }]
 })
 
+// Remove sensitive data before responding, using built-in toJSON method
+userSchema.methods.toJSON = function () {
+  const publicUser = this.toObject()
+  for (const item of ['_id', '__v', 'password', 'tokens']) {
+    delete publicUser[item]
+  }
+  return publicUser
+}
+
 // Generate an auth token with an instance method
 userSchema.methods.generateAuthToken = async function () {
   // Normal function as requires 'this' binding
