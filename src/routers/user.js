@@ -1,6 +1,6 @@
 const express = require('express')
 require('../db/mongoose')
-const { isValidId, updateContainsValidFields } = require('../utils/utils')
+const { updateContainsValidFields } = require('../utils/utils')
 const User = require('../models/user')
 
 const router = express.Router()
