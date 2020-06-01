@@ -17,59 +17,31 @@ router.post('/users', async (req, res) => {
   }
 })
 
-// READ an Authenticated User Profile
+// READ logged in User
 router.get('/users/me', async (req, res) => {
   res.json(req.taskManagerUser)
 })
 
-// READ a User by id
-router.get('/users/:id', async (req, res) => {
-  const _id = req.params.id
-  try {
-    // Check id is valid to avoid Mongoose 500
-    if (!isValidId(_id)) {
-      return res.status(400).json({ message: '_id is not valid' })
-    }
-    const user = await User.findById(_id)
-    if (!user) { return res.status(404).json() }
-    res.json(user)
-  } catch (error) {
-    res.status(500).json()
-  }
-})
-
-// UPDATE (patch) a User by id
-router.patch('/users/:id', async (req, res) => {
+// UPDATE (patch) logged in User
+router.patch('/users/me', async (req, res) => {
   try {
     if (!updateContainsValidFields(User, req.body)) {
       return res.status(400).json({ message: 'Not a valid update' })
     }
-    const _id = req.params.id
-    // Check id is valid to avoid Mongoose 500
-    if (!isValidId(_id)) {
-      return res.status(400).json({ message: 'That doesn\'t seem to be a valid id' })
-    }
-    const user = await User.findById(_id)
+    const user = req.taskManagerUser
     Object.keys(req.body).forEach(update => { user[update] = req.body[update] })
     await user.save()
-    if (!user) { return res.status(404).json() }
     res.json(user)
   } catch (error) {
     res.status(400).json(error.message)
   }
 })
 
-// DELETE a User by id
-router.delete('/users/:id', async (req, res) => {
-  const _id = req.params.id
+// DELETE logged in User
+router.delete('/users/me', async (req, res) => {
   try {
-    // Check id is valid to avoid Mongoose 500
-    if (!isValidId(_id)) {
-      return res.status(400).json({ message: '_id is not valid' })
-    }
-    const user = await User.findByIdAndDelete(_id)
-    if (!user) { return res.status(404).json() }
-    res.json(user)
+    req.taskManagerUser.remove()
+    res.json(req.taskManagerUser)
   } catch (error) {
     res.status(500).json()
   }
