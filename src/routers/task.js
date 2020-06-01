@@ -22,7 +22,7 @@ router.post('/tasks', async (req, res) => {
 // READ all Tasks
 router.get('/tasks', async (req, res) => {
   try {
-    const tasks = await Task.find({})
+    const tasks = await Task.find({ owner: req.taskManagerUser._id })
     res.json(tasks)
   } catch (error) {
     res.status(500).json()
@@ -37,7 +37,7 @@ router.get('/tasks/:id', async (req, res) => {
     if (!isValidId(_id)) {
       return res.status(400).json({ message: '_id is not valid' })
     }
-    const task = await Task.findById(_id)
+    const task = await Task.findOne({ _id, owner: req.taskManagerUser._id })
     if (!task) { return res.status(404).json() }
     res.json(task)
   } catch (error) {
@@ -56,10 +56,10 @@ router.patch('/tasks/:id', async (req, res) => {
     if (!isValidId(_id)) {
       return res.status(400).json({ message: '_id is not valid' })
     }
-    const task = await Task.findById(_id)
+    const task = await Task.findOne({ _id, owner: req.taskManagerUser._id })
+    if (!task) { return res.status(404).json() }
     Object.keys(req.body).forEach(update => { task[update] = req.body[update] })
     await task.save()
-    if (!task) { return res.status(404).json() }
     res.json(task)
   } catch (error) {
     res.status(400).json(error.message)
@@ -74,8 +74,9 @@ router.delete('/tasks/:id', async (req, res) => {
     if (!isValidId(_id)) {
       return res.status(400).json({ message: '_id is not valid' })
     }
-    const task = await Task.findByIdAndDelete(_id)
+    const task = await Task.findOne({ _id, owner: req.taskManagerUser._id })
     if (!task) { return res.status(404).json() }
+    task.remove()
     res.json(task)
   } catch (error) {
     res.status(500).json()

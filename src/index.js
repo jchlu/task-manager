@@ -17,7 +17,7 @@ app.listen(port, _ => {
   console.log(`Server up and running at port ${port}`)
 })
 
-const User = require('./models/user')
+/* const User = require('./models/user')
 const main = async _ => {
   try {
     const user = await User.findById('5ed41e28c3fcea6a36f8a48e')
@@ -28,4 +28,4 @@ const main = async _ => {
   }
 }
 
-main()
+main() */
