@@ -27,12 +27,7 @@ const upload = multer({
   }
 })
 
-// Demo middleware throwing an error
-const errorMiddleware = (request, response, next) => {
-  throw new Error('This is a demo error message')
-}
-
-app.post('/upload', errorMiddleware, (request, response) => {
+app.post('/upload', upload.single('upload'), (request, response) => {
   response.json()
 }, (e, request, response, next) => {
   response.status(400).json({ error: e.message })
