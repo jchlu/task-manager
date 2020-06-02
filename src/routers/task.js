@@ -6,98 +6,98 @@ const Task = require('../models/task')
 const router = express.Router()
 
 // CREATE Task
-router.post('/tasks', async (req, res) => {
+router.post('/tasks', async (request, response) => {
   const task = new Task({
-    ...req.body,
-    owner: req.taskManagerUser._id
+    ...request.body,
+    owner: request.taskManagerUser._id
   })
   try {
     await task.save()
-    res.status(201).json(task)
+    response.status(201).json(task)
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    response.status(400).json({ message: error.message })
   }
 })
 
 // READ all Tasks
 // GET /tasks?completed=[true|false]&limit=[int]&skip=[int]
 // GET /tasks?sortBy=[createdAt|updatedAt|completed]_[asc|desc]
-router.get('/tasks', async (req, res) => {
+router.get('/tasks', async (request, response) => {
   const match = {}
   const sort = {}
-  if (req.query.completed) {
-    match.completed = req.query.completed === 'true'
+  if (request.query.completed) {
+    match.completed = request.query.completed === 'true'
   }
-  if (req.query.sortBy) {
-    const parts = req.query.sortBy.split('_')
+  if (request.query.sortBy) {
+    const parts = request.query.sortBy.split('_')
     sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
   }
   try {
-    await req.taskManagerUser.populate({
+    await request.taskManagerUser.populate({
       path: 'tasks',
       match,
       options: {
-        limit: parseInt(req.query.limit),
-        skip: parseInt(req.query.skip),
+        limit: parseInt(request.query.limit),
+        skip: parseInt(request.query.skip),
         sort
       }
     }).execPopulate()
-    res.json(req.taskManagerUser.tasks)
+    response.json(request.taskManagerUser.tasks)
   } catch (e) {
-    res.status(500).json()
+    response.status(500).json()
   }
 })
 
 // READ Task by id
-router.get('/tasks/:id', async (req, res) => {
-  const _id = req.params.id
+router.get('/tasks/:id', async (request, response) => {
+  const _id = request.params.id
   try {
     // Check id is valid to avoid Mongoose 500
     if (!isValidId(_id)) {
-      return res.status(400).json({ message: '_id is not valid' })
+      return response.status(400).json({ message: '_id is not valid' })
     }
-    const task = await Task.findOne({ _id, owner: req.taskManagerUser._id })
-    if (!task) { return res.status(404).json() }
-    res.json(task)
+    const task = await Task.findOne({ _id, owner: request.taskManagerUser._id })
+    if (!task) { return response.status(404).json() }
+    response.json(task)
   } catch (error) {
-    res.status(500).json()
+    response.status(500).json()
   }
 })
 
 // UPDATE a Task by id
-router.patch('/tasks/:id', async (req, res) => {
+router.patch('/tasks/:id', async (request, response) => {
   try {
-    if (!updateContainsValidFields(Task, req.body)) {
-      return res.status(400).json({ message: 'Not a valid update' })
+    if (!updateContainsValidFields(Task, request.body)) {
+      return response.status(400).json({ message: 'Not a valid update' })
     }
     // Check id is valid to avoid Mongoose 500
-    const _id = req.params.id
+    const _id = request.params.id
     if (!isValidId(_id)) {
-      return res.status(400).json({ message: '_id is not valid' })
+      return response.status(400).json({ message: '_id is not valid' })
     }
-    const task = await Task.findOne({ _id, owner: req.taskManagerUser._id })
-    if (!task) { return res.status(404).json() }
-    Object.keys(req.body).forEach(update => { task[update] = req.body[update] })
+    const task = await Task.findOne({ _id, owner: request.taskManagerUser._id })
+    if (!task) { return response.status(404).json() }
+    Object.keys(request.body).forEach(update => { task[update] = request.body[update] })
     await task.save()
-    res.json(task)
+    response.json(task)
   } catch (error) {
-    res.status(400).json(error.message)
+    response.status(400).json(error.message)
   }
 })
 
 // DELETE Task by id
-router.delete('/tasks/:id', async (req, res) => {
-  const _id = req.params.id
+router.delete('/tasks/:id', async (request, response) => {
+  const _id = request.params.id
   try {
     // Check id is valid to avoid Mongoose 500
     if (!isValidId(_id)) {
-      return res.status(400).json({ message: '_id is not valid' })
+      return response.status(400).json({ message: '_id is not valid' })
     }
-    const task = await Task.findOneAndDelete({ _id, owner: req.taskManagerUser._id })
-    if (!task) { return res.status(404).json() }
-    res.json(task)
+    const task = await Task.findOneAndDelete({ _id, owner: request.taskManagerUser._id })
+    if (!task) { return response.status(404).json() }
+    response.json(task)
   } catch (error) {
-    res.status(500).json()
+    response.status(500).json()
   }
 })
 

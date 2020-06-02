@@ -7,83 +7,83 @@ const User = require('../models/user')
 const router = express.Router()
 
 // CREATE User
-router.post('/users', async (req, res) => {
-  const user = new User(req.body)
+router.post('/users', async (request, response) => {
+  const user = new User(request.body)
   try {
     await user.save()
     const token = await user.generateAuthToken()
-    res.status(201).json({ user, token })
+    response.status(201).json({ user, token })
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    response.status(400).json({ message: error.message })
   }
 })
 
 // READ logged in User
-router.get('/users/me', async (req, res) => {
-  res.json(req.taskManagerUser)
+router.get('/users/me', async (request, response) => {
+  response.json(request.taskManagerUser)
 })
 
 // UPDATE (patch) logged in User
-router.patch('/users/me', async (req, res) => {
+router.patch('/users/me', async (request, response) => {
   try {
-    if (!updateContainsValidFields(User, req.body)) {
-      return res.status(400).json({ message: 'Not a valid update' })
+    if (!updateContainsValidFields(User, request.body)) {
+      return response.status(400).json({ message: 'Not a valid update' })
     }
-    const user = req.taskManagerUser
-    Object.keys(req.body).forEach(update => { user[update] = req.body[update] })
+    const user = request.taskManagerUser
+    Object.keys(request.body).forEach(update => { user[update] = request.body[update] })
     await user.save()
-    res.json(user)
+    response.json(user)
   } catch (error) {
-    res.status(400).json(error.message)
+    response.status(400).json(error.message)
   }
 })
 
 // DELETE logged in User
-router.delete('/users/me', async (req, res) => {
+router.delete('/users/me', async (request, response) => {
   try {
-    req.taskManagerUser.remove()
-    res.json(req.taskManagerUser)
+    request.taskManagerUser.remove()
+    response.json(request.taskManagerUser)
   } catch (error) {
-    res.status(500).json()
+    response.status(500).json()
   }
 })
 
 // User Login
-router.post('/users/login', async (req, res) => {
+router.post('/users/login', async (request, response) => {
   try {
-    const { email, password } = req.body
+    const { email, password } = request.body
     const user = await User.findByCredentials(email, password)
     const token = await user.generateAuthToken()
-    res.json({ user, token })
+    response.json({ user, token })
   } catch (e) {
-    res.status(400).json(e)
+    response.status(400).json(e)
   }
 })
 
 // User Logout
-router.post('/users/logout', async (req, res) => {
+router.post('/users/logout', async (request, response) => {
   try {
-    req.taskManagerUser.tokens = req.taskManagerUser.tokens.filter(token => token.token !== req.taskManagerToken)
-    await req.taskManagerUser.save()
-    res.json()
+    request.taskManagerUser.tokens = request.taskManagerUser.tokens.filter(token => token.token !== request.taskManagerToken)
+    await request.taskManagerUser.save()
+    response.json()
   } catch (e) {
-    res.status(500).json()
+    response.status(500).json()
   }
 })
 
 // User Logout Everywhere
-router.post('/users/logout-everywhere', async (req, res) => {
+router.post('/users/logout-everywhere', async (request, response) => {
   try {
-    req.taskManagerUser.tokens = []
-    await req.taskManagerUser.save()
-    res.json()
+    request.taskManagerUser.tokens = []
+    await request.taskManagerUser.save()
+    response.json()
   } catch (e) {
-    res.status(500).json()
+    response.status(500).json()
   }
 })
 
 // Avatar upload
 const upload = multer({ dest: 'avatars' })
-router.post('/users/me/avatar', upload.single('avatar'), (req, res) => res.send())
+router.post('/users/me/avatar', upload.single('avatar'), (request, response) => response.send())
 
 module.exports = router
