@@ -1,4 +1,5 @@
 const express = require('express')
+const multer = require('multer')
 require('../db/mongoose')
 const { updateContainsValidFields } = require('../utils/utils')
 const User = require('../models/user')
@@ -80,5 +81,9 @@ router.post('/users/logout-everywhere', async (req, res) => {
     res.status(500).json()
   }
 })
+
+// Avatar upload
+const upload = multer({ dest: 'avatars' })
+router.post('/users/me/avatar', upload.single('avatar'), (req, res) => res.send())
 
 module.exports = router
