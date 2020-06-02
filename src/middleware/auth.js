@@ -2,7 +2,19 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
 module.exports = async (request, response, next) => {
-  if (request.method === 'POST' && ((request.path === '/users/login') || (request.path === '/users'))) {
+  if (
+    (
+      request.method === 'POST' &&
+      (
+        request.path === '/users/login' ||
+        request.path === '/users'
+      )
+    ) ||
+    (
+      request.method === 'GET' &&
+      request.path.match(/\/users\/\w+\/avatar$/)
+    )
+  ) {
     next()
   } else {
     try {

@@ -1,6 +1,7 @@
 const express = require('express')
 require('../db/mongoose')
-const { isValidId, updateContainsValidFields } = require('../utils/utils')
+const isValidId = require('../middleware/validate-id')
+const isValidUpdate = require('../middleware/validate-fields')
 const Task = require('../models/task')
 
 const router = express.Router()
@@ -49,13 +50,9 @@ router.get('/tasks', async (request, response) => {
 })
 
 // READ Task by id
-router.get('/tasks/:id', async (request, response) => {
+router.get('/tasks/:id', isValidId, async (request, response) => {
   const _id = request.params.id
   try {
-    // Check id is valid to avoid Mongoose 500
-    if (!isValidId(_id)) {
-      return response.status(400).json({ message: '_id is not valid' })
-    }
     const task = await Task.findOne({ _id, owner: request.taskManagerUser._id })
     if (!task) { return response.status(404).json() }
     response.json(task)
@@ -65,17 +62,9 @@ router.get('/tasks/:id', async (request, response) => {
 })
 
 // UPDATE a Task by id
-router.patch('/tasks/:id', async (request, response) => {
+router.patch('/tasks/:id', isValidId, isValidUpdate, async (request, response) => {
   try {
-    if (!updateContainsValidFields(Task, request.body)) {
-      return response.status(400).json({ message: 'Not a valid update' })
-    }
-    // Check id is valid to avoid Mongoose 500
-    const _id = request.params.id
-    if (!isValidId(_id)) {
-      return response.status(400).json({ message: '_id is not valid' })
-    }
-    const task = await Task.findOne({ _id, owner: request.taskManagerUser._id })
+    const task = await Task.findOne({ _id: request.params.id, owner: request.taskManagerUser._id })
     if (!task) { return response.status(404).json() }
     Object.keys(request.body).forEach(update => { task[update] = request.body[update] })
     await task.save()

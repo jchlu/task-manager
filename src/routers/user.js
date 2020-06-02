@@ -1,7 +1,9 @@
 const express = require('express')
-const multer = require('multer')
+const FileType = require('file-type')
 require('../db/mongoose')
-const { updateContainsValidFields } = require('../utils/utils')
+const isValidId = require('../middleware/validate-id')
+const isValidUpdate = require('../middleware/validate-fields')
+const upload = require('../middleware/avatar-upload')
 const User = require('../models/user')
 
 const router = express.Router()
@@ -24,11 +26,8 @@ router.get('/users/me', async (request, response) => {
 })
 
 // UPDATE (patch) logged in User
-router.patch('/users/me', async (request, response) => {
+router.patch('/users/me', isValidUpdate, async (request, response) => {
   try {
-    if (!updateContainsValidFields(User, request.body)) {
-      return response.status(400).json({ message: 'Not a valid update' })
-    }
     const user = request.taskManagerUser
     Object.keys(request.body).forEach(update => { user[update] = request.body[update] })
     await user.save()
@@ -82,25 +81,37 @@ router.post('/users/logout-everywhere', async (request, response) => {
   }
 })
 
-// Avatar upload
-const upload = multer({
-  // Removed to allow access to request.file: dest: 'avatars',
-  limits: {
-    fileSize: 1000000
-  },
-  fileFilter: function (request, file, callback) {
-    if (!file.originalname.match(/\.((pn)|(jp(e)?))g$/)) {
-      callback(new Error('Please upload an image with a maximum size of 1MB'), undefined)
-    }
-    callback(undefined, true)
-  }
-})
 router.post('/users/me/avatar', upload.single('avatar'), async (request, response) => {
   request.taskManagerUser.avatar = request.file.buffer
   await request.taskManagerUser.save()
   response.json()
 }, (e, request, response, next) => {
   response.status(400).json({ error: e.message })
+})
+
+router.delete('/users/me/avatar', async (request, response) => {
+  request.taskManagerUser.avatar = undefined
+  await request.taskManagerUser.save()
+  response.json()
+}, (e, request, response, next) => {
+  response.status(400).json({ error: e.message })
+})
+
+router.get('/users/:id/avatar', isValidId, async (request, response) => {
+  try {
+    const user = await User.findById(request.params.id)
+    if (!user || !user.avatar) {
+      throw new Error('no user avatar found')
+    }
+    // grab the file type from the buffer in the db
+    const fileType = await FileType.fromBuffer(user.avatar)
+    // set the header
+    response.set('Content-Type', fileType.mime)
+    // return the image
+    response.send(user.avatar)
+  } catch (e) {
+    response.status(404).json({ error: e.message })
+  }
 })
 
 module.exports = router
