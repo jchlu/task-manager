@@ -15,10 +15,20 @@ const app = express()
 
 const multer = require('multer')
 const upload = multer({
-  dest: 'images'
+  dest: 'images',
+  limits: {
+    fileSize: 1000000
+  },
+  fileFilter: function (request, file, callback) {
+    if (!file.originalname.endsWith('.pdf')) {
+      return callback(new Error('Please upload only PDF documents'))
+    }
+    callback(undefined, true)
+  }
 })
+
 app.post('/upload', upload.single('upload'), (request, response) => {
-  response.send()
+  response.json()
 })
 
 app.listen(port, _ => {
