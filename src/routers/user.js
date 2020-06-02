@@ -1,5 +1,6 @@
 const express = require('express')
 const FileType = require('file-type')
+const sharp = require('sharp')
 require('../db/mongoose')
 const isValidId = require('../middleware/validate-id')
 const isValidUpdate = require('../middleware/validate-fields')
@@ -82,7 +83,11 @@ router.post('/users/logout-everywhere', async (request, response) => {
 })
 
 router.post('/users/me/avatar', upload.single('avatar'), async (request, response) => {
-  request.taskManagerUser.avatar = request.file.buffer
+  const buffer = await sharp(request.file.buffer)
+    .resize({ width: 250, height: 250, fit: 'inside' })
+    .png()
+    .toBuffer()
+  request.taskManagerUser.avatar = buffer
   await request.taskManagerUser.save()
   response.json()
 }, (e, request, response, next) => {
