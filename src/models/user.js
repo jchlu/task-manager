@@ -63,7 +63,7 @@ userSchema.virtual('tasks', {
 // Remove sensitive data before responding, using built-in toJSON method
 userSchema.methods.toJSON = function () {
   const publicUser = this.toObject()
-  for (const item of ['_id', '__v', 'password', 'tokens']) {
+  for (const item of ['_id', '__v', 'password', 'tokens', 'avatar']) {
     delete publicUser[item]
   }
   return publicUser
