@@ -84,7 +84,7 @@ router.post('/users/logout-everywhere', async (request, response) => {
 
 // Avatar upload
 const upload = multer({
-  dest: 'avatars',
+  // Removed to allow access to request.file: dest: 'avatars',
   limits: {
     fileSize: 1000000
   },
@@ -95,7 +95,9 @@ const upload = multer({
     callback(undefined, true)
   }
 })
-router.post('/users/me/avatar', upload.single('avatar'), (request, response) => {
+router.post('/users/me/avatar', upload.single('avatar'), async (request, response) => {
+  request.taskManagerUser.avatar = request.file.buffer
+  await request.taskManagerUser.save()
   response.json()
 }, (e, request, response, next) => {
   response.status(400).json({ error: e.message })
