@@ -83,7 +83,18 @@ router.post('/users/logout-everywhere', async (request, response) => {
 })
 
 // Avatar upload
-const upload = multer({ dest: 'avatars' })
+const upload = multer({
+  dest: 'avatars',
+  limits: {
+    fileSize: 1000000
+  },
+  fileFilter: function (request, file, callback) {
+    if (!file.originalname.match(/\.((pn)|(jp(e)?))g$/)) {
+      callback(new Error('Please upload an image with a maximum size of 1MB'), undefined)
+    }
+    callback(undefined, true)
+  }
+})
 router.post('/users/me/avatar', upload.single('avatar'), (request, response) => response.send())
 
 module.exports = router
