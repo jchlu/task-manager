@@ -20,7 +20,7 @@ const upload = multer({
     fileSize: 1000000
   },
   fileFilter: function (request, file, callback) {
-    if (!file.originalname.endsWith('.pdf')) {
+    if (!file.originalname.match(/\.(doc)x?$/)) {
       return callback(new Error('Please upload only PDF documents'))
     }
     callback(undefined, true)
