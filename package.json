@@ -21,6 +21,6 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon"
+    "dev": "nodemon -r dotenv/config"
   }
 }
