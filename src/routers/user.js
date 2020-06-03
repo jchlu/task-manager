@@ -4,6 +4,7 @@ const sharp = require('sharp')
 require('../db/mongoose')
 const isValidId = require('../middleware/validate-id')
 const isValidUpdate = require('../middleware/validate-fields')
+const { sendWelcomeEmail, sendCancellationEmail } = require('../emails/account')
 const upload = require('../middleware/avatar-upload')
 const User = require('../models/user')
 
@@ -14,6 +15,7 @@ router.post('/users', async (request, response) => {
   const user = new User(request.body)
   try {
     await user.save()
+    sendWelcomeEmail(user.email, user.name)
     const token = await user.generateAuthToken()
     response.status(201).json({ user, token })
   } catch (error) {
@@ -42,6 +44,7 @@ router.patch('/users/me', isValidUpdate, async (request, response) => {
 router.delete('/users/me', async (request, response) => {
   try {
     request.taskManagerUser.remove()
+    sendCancellationEmail(request.taskManagerUser.email, request.taskManagerUser.name)
     response.json(request.taskManagerUser)
   } catch (error) {
     response.status(500).json()
