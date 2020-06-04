@@ -25,7 +25,10 @@ router.post('/users', async (request, response) => {
 
 // READ logged in User
 router.get('/users/me', async (request, response) => {
-  response.json(request.taskManagerUser)
+  response.json({
+    user: request.taskManagerUser,
+    token: request.taskManagerToken
+  })
 })
 
 // UPDATE (patch) logged in User
