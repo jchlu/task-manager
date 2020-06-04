@@ -21,6 +21,11 @@
     "nodemon": "^2.0.4",
     "supertest": "^4.0.2"
   },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
   "jest": {
     "testEnvironment": "node",
     "testTimeout": 10000

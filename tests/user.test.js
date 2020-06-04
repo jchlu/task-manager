@@ -1,26 +1,13 @@
 const supertest = require('supertest')
 const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
 const app = require('../src/app')
 const User = require('../src/models/user')
+const { userOneId, userOne, setupDatabase, teardownDatabase } = require('./fixtures/db')
 
 const request = supertest(app)
 
-const userOneId = new mongoose.Types.ObjectId()
-const userOne = {
-  _id: userOneId,
-  name: 'User One',
-  email: 'user1@example.com',
-  password: 'Pa55w0rd!',
-  tokens: [{
-    token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET)
-  }]
-}
-
 beforeEach(async () => {
-  await User.deleteMany()
-  await User(userOne).save()
+  await setupDatabase()
 })
 
 test('should create a new user', async () => {
@@ -61,14 +48,13 @@ test('should fail to login an incorrect user', async () => {
 test('should get profile for user with valid jwt', async () => {
   const response = await request.get('/users/me')
     .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
-    .send()
     .expect(200)
   const user = await User.findById(response.body.user._id)
   expect(user).not.toBeNull()
   expect(response.body).toMatchObject({
     user: {
-      name: 'User One',
-      email: 'user1@example.com'
+      name: 'Gene Hunt',
+      email: 'genegenie@example.com'
     },
     token: userOne.tokens[0].token
   })
@@ -76,25 +62,58 @@ test('should get profile for user with valid jwt', async () => {
 
 test('should not get profile without a valid jwt', async () => {
   await request.get('/users/me')
-    .send()
     .expect(401)
 })
 
 test('should not delete profile without a valid jwt', async () => {
   await request.delete('/users/me')
-    .send()
     .expect(401)
 })
 
 test('should delete profile for user with valid jwt', async () => {
   const response = await request.delete('/users/me')
     .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
-    .send()
     .expect(200)
   const user = await User.findById(response.body._id)
   expect(user).toBeNull()
 })
 
-afterAll(() => {
-  mongoose.connection.close()
+test('should upload and process an avatar for a logged in user', async () => {
+  // grab a file from fixtures
+  await request.post('/users/me/avatar')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .attach('avatar', 'tests/fixtures/43ad73db1d0320cb2eb2dc5924dca63e9952d080.jpg')
+    .expect(200)
+  const user = await User.findById(userOneId)
+  expect(user.avatar).toEqual(expect.any(Buffer))
+})
+
+test('should update valid user fields', async () => {
+  const name = 'Sausage Dog'
+  await request.patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({ name })
+    .expect(200)
+  const user = await User.findById(userOneId)
+  expect(user.name).toBe(name)
+})
+
+test('should not update invalid user fields', async () => {
+  const location = 'Las Terrenas'
+  await request.patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({ location })
+    .expect(400)
+})
+
+test('should not update if user not logged in', async () => {
+  const name = 'Sausage Dog'
+  await request.patch('/users/me')
+    .set('Authorization', 'Bearer ')
+    .send({ name })
+    .expect(401)
+})
+
+afterAll(async () => {
+  await teardownDatabase()
 })
