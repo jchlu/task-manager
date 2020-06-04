@@ -22,11 +22,12 @@
     "supertest": "^4.0.2"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testTimeout": 10000
   },
   "scripts": {
     "start": "node src/index.js",
     "dev": "env-cmd nodemon",
-    "test": "env-cmd -f .test.env jest --watch"
+    "test": "env-cmd -f .test.env jest --runInBand --watch"
   }
 }
