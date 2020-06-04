@@ -46,7 +46,7 @@ router.patch('/users/me', isValidUpdate, async (request, response) => {
 // DELETE logged in User
 router.delete('/users/me', async (request, response) => {
   try {
-    request.taskManagerUser.remove()
+    await request.taskManagerUser.remove()
     sendCancellationEmail(request.taskManagerUser.email, request.taskManagerUser.name)
     response.json(request.taskManagerUser)
   } catch (error) {
