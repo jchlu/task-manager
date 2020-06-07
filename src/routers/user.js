@@ -15,7 +15,7 @@ router.post('/users', async (request, response) => {
   const user = new User(request.body)
   try {
     await user.save()
-    sendWelcomeEmail(user.email, user.name)
+    !process.env.DEV && sendWelcomeEmail(user.email, user.name)
     const token = await user.generateAuthToken()
     response.status(201).json({ user, token })
   } catch (error) {
@@ -47,7 +47,7 @@ router.patch('/users/me', isValidUpdate, async (request, response) => {
 router.delete('/users/me', async (request, response) => {
   try {
     await request.taskManagerUser.remove()
-    sendCancellationEmail(request.taskManagerUser.email, request.taskManagerUser.name)
+    !process.env.DEV && sendCancellationEmail(request.taskManagerUser.email, request.taskManagerUser.name)
     response.json(request.taskManagerUser)
   } catch (error) {
     response.status(500).json()
