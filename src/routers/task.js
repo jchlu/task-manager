@@ -10,7 +10,7 @@ const router = express.Router()
 router.post('/tasks', async (request, response) => {
   const task = new Task({
     ...request.body,
-    owner: request.taskManagerUser._id
+    owner: request.taskManagerUser._id,
   })
   try {
     await task.save()
@@ -34,15 +34,17 @@ router.get('/tasks', async (request, response) => {
     sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
   }
   try {
-    await request.taskManagerUser.populate({
-      path: 'tasks',
-      match,
-      options: {
-        limit: parseInt(request.query.limit),
-        skip: parseInt(request.query.skip),
-        sort
-      }
-    }).execPopulate()
+    await request.taskManagerUser
+      .populate({
+        path: 'tasks',
+        match,
+        options: {
+          limit: parseInt(request.query.limit),
+          skip: parseInt(request.query.skip),
+          sort,
+        },
+      })
+      .execPopulate()
     response.json(request.taskManagerUser.tasks)
   } catch (e) {
     response.status(500).json()
@@ -54,7 +56,9 @@ router.get('/tasks/:id', isValidId, async (request, response) => {
   const _id = request.params.id
   try {
     const task = await Task.findOne({ _id, owner: request.taskManagerUser._id })
-    if (!task) { return response.status(404).json() }
+    if (!task) {
+      return response.status(404).json()
+    }
     response.json(task)
   } catch (error) {
     response.status(500).json()
@@ -62,17 +66,29 @@ router.get('/tasks/:id', isValidId, async (request, response) => {
 })
 
 // UPDATE a Task by id
-router.patch('/tasks/:id', isValidId, isValidUpdate, async (request, response) => {
-  try {
-    const task = await Task.findOne({ _id: request.params.id, owner: request.taskManagerUser._id })
-    if (!task) { return response.status(404).json() }
-    Object.keys(request.body).forEach(update => { task[update] = request.body[update] })
-    await task.save()
-    response.json(task)
-  } catch (error) {
-    response.status(400).json(error.message)
-  }
-})
+router.patch(
+  '/tasks/:id',
+  isValidId,
+  isValidUpdate,
+  async (request, response) => {
+    try {
+      const task = await Task.findOne({
+        _id: request.params.id,
+        owner: request.taskManagerUser._id,
+      })
+      if (!task) {
+        return response.status(404).json()
+      }
+      Object.keys(request.body).forEach(update => {
+        task[update] = request.body[update]
+      })
+      await task.save()
+      response.json(task)
+    } catch (error) {
+      response.status(400).json(error.message)
+    }
+  },
+)
 
 // DELETE Task by id
 router.delete('/tasks/:id', async (request, response) => {
@@ -82,8 +98,13 @@ router.delete('/tasks/:id', async (request, response) => {
     if (!isValidId(_id)) {
       return response.status(400).json({ message: '_id is not valid' })
     }
-    const task = await Task.findOneAndDelete({ _id, owner: request.taskManagerUser._id })
-    if (!task) { return response.status(404).json() }
+    const task = await Task.findOneAndDelete({
+      _id,
+      owner: request.taskManagerUser._id,
+    })
+    if (!task) {
+      return response.status(404).json()
+    }
     response.json(task)
   } catch (error) {
     response.status(500).json()

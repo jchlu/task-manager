@@ -1,7 +1,12 @@
 const supertest = require('supertest')
 const app = require('../src/app')
 const Task = require('../src/models/task')
-const { userOneId, userOne, setupDatabase, teardownDatabase } = require('./fixtures/db')
+const {
+  userOneId,
+  userOne,
+  setupDatabase,
+  teardownDatabase,
+} = require('./fixtures/db')
 
 const request = supertest(app)
 

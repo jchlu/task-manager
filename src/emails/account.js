@@ -7,7 +7,7 @@ const sendWelcomeEmail = (email, name) => {
     to: email,
     from: 'task-manager-app@exito.tech',
     subject: 'Welcome to Task Manager',
-    text: `Welcome ${name}, let us know how you get on with the app!`
+    text: `Welcome ${name}, let us know how you get on with the app!`,
   })
 }
 
@@ -16,11 +16,11 @@ const sendCancellationEmail = (email, name) => {
     to: email,
     from: 'task-manager-app@exito.tech',
     subject: 'Sorry to see you go',
-    text: `Dear ${name}, your account on Task Manager has been deleted as requested. Please let us know any feedback by replying to this email.`
+    text: `Dear ${name}, your account on Task Manager has been deleted as requested. Please let us know any feedback by replying to this email.`,
   })
 }
 
 module.exports = {
   sendWelcomeEmail,
-  sendCancellationEmail
+  sendCancellationEmail,
 }

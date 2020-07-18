@@ -8,7 +8,7 @@ const connect = async () => {
       useUnifiedTopology: true,
       useNewUrlParser: true,
       useCreateIndex: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     })
   } catch (e) {
     console.error(e.message)

@@ -9,9 +9,11 @@ const userOne = {
   name: 'Gene Hunt',
   email: 'genegenie@example.com',
   password: 'Fire up the Quattro!',
-  tokens: [{
-    token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET)
-  }]
+  tokens: [
+    {
+      token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET),
+    },
+  ],
 }
 
 const userTwoId = new mongoose.Types.ObjectId()
@@ -20,27 +22,29 @@ const userTwo = {
   name: 'Alex Drake',
   email: 'bollyknickers@example.com',
   password: 'Fire up the Quattro!',
-  tokens: [{
-    token: jwt.sign({ _id: userTwoId }, process.env.JWT_SECRET)
-  }]
+  tokens: [
+    {
+      token: jwt.sign({ _id: userTwoId }, process.env.JWT_SECRET),
+    },
+  ],
 }
 
 const taskOne = {
   description: 'Fire up the Quattro Bols!',
   completed: false,
-  owner: userOneId
+  owner: userOneId,
 }
 
 const taskTwo = {
   description: 'Get to the pub',
   completed: true,
-  owner: userOneId
+  owner: userOneId,
 }
 
 const taskThree = {
   description: 'Drink Wine',
   completed: false,
-  owner: userTwoId
+  owner: userTwoId,
 }
 
 const setupDatabase = async () => {
@@ -62,5 +66,5 @@ module.exports = {
   userOne,
   userTwo,
   setupDatabase,
-  teardownDatabase
+  teardownDatabase,
 }

@@ -3,25 +3,22 @@ const User = require('../models/user')
 
 module.exports = async (request, response, next) => {
   if (
-    (
-      request.method === 'POST' &&
-      (
-        request.path === '/users/login' ||
-        request.path === '/users'
-      )
-    ) ||
-    (
-      request.method === 'GET' &&
-      request.path.match(/\/users\/\w+\/avatar$/)
-    )
+    (request.method === 'POST' &&
+      (request.path === '/users/login' || request.path === '/users')) ||
+    (request.method === 'GET' && request.path.match(/\/users\/\w+\/avatar$/))
   ) {
     next()
   } else {
     try {
       const token = request.header('Authorization').replace('Bearer ', '')
       const decoded = jwt.verify(token, process.env.JWT_SECRET)
-      const user = await User.findOne({ _id: decoded._id, 'tokens.token': token })
-      if (!user) { throw new Error() }
+      const user = await User.findOne({
+        _id: decoded._id,
+        'tokens.token': token,
+      })
+      if (!user) {
+        throw new Error()
+      }
       request.taskManagerToken = token
       request.taskManagerUser = user
       next()

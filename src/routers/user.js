@@ -27,7 +27,7 @@ router.post('/users', async (request, response) => {
 router.get('/users/me', async (request, response) => {
   response.json({
     user: request.taskManagerUser,
-    token: request.taskManagerToken
+    token: request.taskManagerToken,
   })
 })
 
@@ -35,7 +35,9 @@ router.get('/users/me', async (request, response) => {
 router.patch('/users/me', isValidUpdate, async (request, response) => {
   try {
     const user = request.taskManagerUser
-    Object.keys(request.body).forEach(update => { user[update] = request.body[update] })
+    Object.keys(request.body).forEach(update => {
+      user[update] = request.body[update]
+    })
     await user.save()
     response.json(user)
   } catch (error) {
@@ -47,7 +49,11 @@ router.patch('/users/me', isValidUpdate, async (request, response) => {
 router.delete('/users/me', async (request, response) => {
   try {
     await request.taskManagerUser.remove()
-    !process.env.DEV && sendCancellationEmail(request.taskManagerUser.email, request.taskManagerUser.name)
+    !process.env.DEV &&
+      sendCancellationEmail(
+        request.taskManagerUser.email,
+        request.taskManagerUser.name,
+      )
     response.json(request.taskManagerUser)
   } catch (error) {
     response.status(500).json()
@@ -69,7 +75,9 @@ router.post('/users/login', async (request, response) => {
 // User Logout
 router.post('/users/logout', async (request, response) => {
   try {
-    request.taskManagerUser.tokens = request.taskManagerUser.tokens.filter(token => token.token !== request.taskManagerToken)
+    request.taskManagerUser.tokens = request.taskManagerUser.tokens.filter(
+      token => token.token !== request.taskManagerToken,
+    )
     await request.taskManagerUser.save()
     response.json()
   } catch (e) {
@@ -88,25 +96,34 @@ router.post('/users/logout-everywhere', async (request, response) => {
   }
 })
 
-router.post('/users/me/avatar', upload.single('avatar'), async (request, response) => {
-  const buffer = await sharp(request.file.buffer)
-    .resize({ width: 250, height: 250, fit: 'inside' })
-    .png()
-    .toBuffer()
-  request.taskManagerUser.avatar = buffer
-  await request.taskManagerUser.save()
-  response.json()
-}, (e, request, response, next) => {
-  response.status(400).json({ error: e.message })
-})
+router.post(
+  '/users/me/avatar',
+  upload.single('avatar'),
+  async (request, response) => {
+    const buffer = await sharp(request.file.buffer)
+      .resize({ width: 250, height: 250, fit: 'inside' })
+      .png()
+      .toBuffer()
+    request.taskManagerUser.avatar = buffer
+    await request.taskManagerUser.save()
+    response.json()
+  },
+  (e, request, response, next) => {
+    response.status(400).json({ error: e.message })
+  },
+)
 
-router.delete('/users/me/avatar', async (request, response) => {
-  request.taskManagerUser.avatar = undefined
-  await request.taskManagerUser.save()
-  response.json()
-}, (e, request, response, next) => {
-  response.status(400).json({ error: e.message })
-})
+router.delete(
+  '/users/me/avatar',
+  async (request, response) => {
+    request.taskManagerUser.avatar = undefined
+    await request.taskManagerUser.save()
+    response.json()
+  },
+  (e, request, response, next) => {
+    response.status(400).json({ error: e.message })
+  },
+)
 
 router.get('/users/:id/avatar', isValidId, async (request, response) => {
   try {

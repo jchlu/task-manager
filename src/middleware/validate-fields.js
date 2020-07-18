@@ -13,8 +13,9 @@ module.exports = async (request, response, next) => {
       throw new Error('Not a valid model name')
     }
     const updates = Object.keys(request.body)
-    const allowedUpdates = Object.keys(model.schema.tree)
-      .filter(item => !['id', '_id', '__v'].includes(item))
+    const allowedUpdates = Object.keys(model.schema.tree).filter(
+      item => !['id', '_id', '__v'].includes(item),
+    )
     if (!updates.every(update => allowedUpdates.includes(update))) {
       throw new Error('Not a valid update')
     }
